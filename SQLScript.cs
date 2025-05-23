@@ -1,5 +1,4 @@
 using Microsoft.Data.Sqlite;
-using System;
 
 namespace SQLScript
 {
@@ -91,9 +90,10 @@ namespace SQLScript
             {
                 validateDateTime(end);
             }
-            
+
 
             // if tags, add tags to the tags table 
+            // insert into taskTagsTable
 
 
         }
