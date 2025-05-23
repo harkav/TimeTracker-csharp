@@ -93,11 +93,15 @@ namespace SQLScript
             }
             
 
+            // if tags, add tags to the tags table 
+
 
         }
 
         public static void validateInputStartTask(string[] input)
         {
+
+            // do I need this? Think not
             if (input.Length < 2)
             {
                 throw new ArgumentException("Not enough arguments, expected at least 2");
