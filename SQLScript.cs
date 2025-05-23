@@ -1,5 +1,6 @@
 using Microsoft.Data.Sqlite;
 
+
 namespace SQLScript
 {
     public class SQLScripts
@@ -93,6 +94,28 @@ namespace SQLScript
 
 
             // if tags, add tags to the tags table 
+
+            if (tags != null)
+            { // what if the input contains several of the same elements, like "kvakk" and "kvakk". Turn into a set? 
+                List<string> existing_tags = getTags();
+                List<string> unique_tags = getTags();
+                foreach (string tag in tags)
+                {
+                    if (!existing_tags.Contains(tag))
+                    {
+                        unique_tags.Add(tag);
+                        insertIntoTags(tag);
+                    }
+                }
+
+            }
+            // insert into task table 
+
+
+
+
+
+
             // insert into taskTagsTable
 
 
@@ -107,7 +130,7 @@ namespace SQLScript
                 throw new ArgumentException("Not enough arguments, expected at least 2");
             }
             string maybeTime = input[1];
-            DateTime validatedTime = validateDateTime(maybeTime); 
+            DateTime validatedTime = validateDateTime(maybeTime);
 
 
 
@@ -119,12 +142,69 @@ namespace SQLScript
 
             if (!success)
             {
-                throw new ArgumentException($"Could not prase {maybeDateTimeString} Use format YYYY-MM-DD"); 
+                throw new ArgumentException($"Could not prase {maybeDateTimeString} Use format YYYY-MM-DD");
             }
 
-            return parsedDateTime; 
+            return parsedDateTime;
+        }
+
+        public static List<string> getTags()
+        {
+
+            var sql = "SELECT * FROM tags";
+            List<string> tags = new List<string> { };
+
+            try
+            {
+                using var connection = new SqliteConnection("Data Source=test.db");
+                connection.Open();
+
+                using var command = new SqliteCommand(sql, connection);
+
+                using var reader = command.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+
+                    while (reader.Read())
+                    {
+                        var tag = reader.GetString(1);
+                        tags.Add(tag);
+                    }
+                }
+
+
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+
+
+            }
+            return tags;
+        }
+
+        public static void insertIntoTags(string tag)
+        {
+            var sql = "INSERT INTO tags (tag) VALUES ($tag)";
+            using var connection = new SqliteConnection("Data Source=test.db");
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("$tag", tag);
+
+            try
+            {
+                command.ExecuteNonQuery();
+            }
+
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
         
+        //public static void insertIntoTasks( )
     }
-    
+
 }
